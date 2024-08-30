@@ -3,15 +3,30 @@
         <script>
             function init()
             {
-                return 
+
             }
+            function rectangle(x,y,color)
+            {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+            }
+            function draw()
+            {
+                const canvas = document.getElementById("myCanvas");
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle="green";
+                ctx.strokeRect(20,20,25,25);
+                ctx.fillRect(20,20,25,25);
+            }
+
         </script>
-        <body>
-            <canvas style="border:1px solid gray;"></canvas>
+        <body onload="draw()">
+            <canvas id="myCanvas" style="border:1px solid gray;"></canvas>
             <br>
             <button>Change Spawn Color</button>
-            <p>"Frame Count: 0</p>
-            <p>"Rectangle Count: 0</p>
+            <p>Frame Count: 0</p>
+            <p>Rectangle Count: 0</p>
         </body>
     </head>
 </html>
