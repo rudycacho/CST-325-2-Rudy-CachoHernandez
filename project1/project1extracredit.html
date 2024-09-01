@@ -1,0 +1,87 @@
+<html>
+    <head>
+
+        <script>
+            // Initial Function
+            var currentFrameNumber = 0
+            var sceneList = []
+            function init() {
+                updateAndDraw();
+                console.log(currentFrameNumber);
+
+            }
+            // Rectangle Creation
+            function Rectangle(x,y,color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.velocity = {
+                    x: 0,
+                    y: 0
+                }
+            }
+            // Prototype
+            const RectanglePrototype = {};
+            // Adding Update Function To Prototype
+            RectanglePrototype.update = function () {
+                this.velocity.x = this.x++;
+                if (this.x > 0) {
+                    this.x = this.x + 20;
+                }
+                if (this.x > 200) {
+                    this.x = this.x - 20;
+                }
+                this.velocity.y = this.y++;
+                this.y = this.y + this.velocity.y * 0.16;
+
+            }
+            // Adding Draw Function To Prototype
+            RectanglePrototype.draw = function () {
+                const canvas = document.getElementById("myCanvas");
+                const ctx = canvas.getContext("2d");
+                ctx.fillStyle = this.color;
+                ctx.strokeRect(this.x, this.y, 50, 50);
+                ctx.fillRect(this.x, this.y, 50, 50);
+            }
+            // Linking Prototype To Rectangle
+            Rectangle.prototype = RectanglePrototype;
+            // Main Update And Draw Function
+            function updateAndDraw(){
+                const canvas = document.getElementById("myCanvas");
+                const ctx = canvas.getContext("2d");
+                ctx.clearRect(0,0,300,200);
+                var x = 0;
+                var y = 0;
+
+                var color = ("#" + Math.floor(Math.random()*16777215).toString(16));
+                var rectangleInstance = new Rectangle(x,y,color);
+
+                sceneList.push(rectangleInstance)
+                for(let i = 0; i < sceneList.length; i++){
+                    sceneList[i].draw();
+                    sceneList[i].update();
+
+                }
+                requestAnimationFrame(updateAndDraw);
+                currentFrameNumber++;
+                updateStats();
+            }
+            // Update Stat Text
+            function updateStats(){
+                var p = document.getElementById("frameCount");
+                p.innerText = "Frame Count: " + currentFrameNumber;
+                var p = document.getElementById("rectangleCount");
+                p.innerText = "Rectangles Count: " + sceneList.length;
+                if (sceneList.length > 200){
+                    sceneList.splice(1,1)
+                }
+            }
+        </script>
+        <body onload="init()">
+            <canvas id="myCanvas" width="300" height="200" style="border:1px solid gray;"></canvas>
+            <br>
+            <p id="frameCount">Frame Count: 0</p>
+            <p id="rectangleCount">Rectangle Count: 0</p>
+        </body>
+    </head>
+</html>
