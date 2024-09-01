@@ -3,25 +3,26 @@
         <script>
             function init()
             {
-
+                var newRectangleInstance = new Rectangle(20,20,"rgb(0, 255, 0");
+                draw(newRectangleInstance.x, newRectangleInstance.y, newRectangleInstance.color)
             }
-            function rectangle(x,y,color)
+            function Rectangle(x,y,color)
             {
                 this.x = x;
                 this.y = y;
                 this.color = color;
             }
-            function draw()
+            function draw(x,y,color)
             {
                 const canvas = document.getElementById("myCanvas");
                 const ctx = canvas.getContext("2d");
-                ctx.fillStyle="green";
-                ctx.strokeRect(20,20,25,25);
-                ctx.fillRect(20,20,25,25);
+                ctx.fillStyle=color;
+                ctx.strokeRect(x,y,25,25);
+                ctx.fillRect(x,y,25,25);
             }
 
         </script>
-        <body onload="draw()">
+        <body onload="init()">
             <canvas id="myCanvas" style="border:1px solid gray;"></canvas>
             <br>
             <button>Change Spawn Color</button>
