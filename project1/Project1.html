@@ -1,26 +1,29 @@
 <html>
     <head>
         <script>
+            // Initial Function
             function init()
             {
-                var newRectangleInstance = new Rectangle(20,20,"rgb(0, 255, 0");
-                draw(newRectangleInstance.x, newRectangleInstance.y, newRectangleInstance.color)
+                // New Instance Of Rectangle
+                var newRectangleInstance = new Rectangle(20,20,"rgb(0, 255, 0)");
+                // Drawing New Rectangle
+                newRectangleInstance.draw();
             }
+            // Rectangle Creation
             function Rectangle(x,y,color)
             {
                 this.x = x;
                 this.y = y;
                 this.color = color;
+                this.draw = function()
+                {
+                    const canvas = document.getElementById("myCanvas");
+                    const ctx = canvas.getContext("2d");
+                    ctx.fillStyle = color;
+                    ctx.strokeRect(x, y, 25, 25);
+                    ctx.fillRect(x, y, 25, 25);
+                }
             }
-            function draw(x,y,color)
-            {
-                const canvas = document.getElementById("myCanvas");
-                const ctx = canvas.getContext("2d");
-                ctx.fillStyle=color;
-                ctx.strokeRect(x,y,25,25);
-                ctx.fillRect(x,y,25,25);
-            }
-
         </script>
         <body onload="init()">
             <canvas id="myCanvas" style="border:1px solid gray;"></canvas>
