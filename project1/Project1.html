@@ -1,22 +1,20 @@
 <html>
     <head>
+
         <script>
             // Initial Function
-            function init()
-            {
-                // New Instance Of Rectangle
-                var newRectangleInstance = new Rectangle(20,20,"rgb(0, 255, 0)");
-                // Drawing New Rectangle
-                newRectangleInstance.draw();
+            var currentFrameNumber = 0
+            var sceneList = []
+            function init() {
+                updateAndDraw();
+                console.log(currentFrameNumber);
             }
             // Rectangle Creation
-            function Rectangle(x,y,color)
-            {
+            function Rectangle(x,y,color,draw) {
                 this.x = x;
                 this.y = y;
                 this.color = color;
-                this.draw = function()
-                {
+                this.draw = function() {
                     const canvas = document.getElementById("myCanvas");
                     const ctx = canvas.getContext("2d");
                     ctx.fillStyle = color;
@@ -24,13 +22,33 @@
                     ctx.fillRect(x, y, 25, 25);
                 }
             }
+            function updateAndDraw(){
+                var x = Math.floor(Math.random()*300);
+                var y = Math.floor(Math.random()*150);
+                var color = ("#" + Math.floor(Math.random()*16777215).toString(16));
+                var rectangleInstance = new Rectangle(x,y,color);
+
+                sceneList.push(rectangleInstance)
+                for(let i = 0; i < sceneList.length; i++){
+                    sceneList[i].draw();
+                }
+                requestAnimationFrame(updateAndDraw);
+                currentFrameNumber++;
+                updateStats();
+            }
+            function updateStats(){
+                var p = document.getElementById("frameCount");
+                p.innerText = "Frame Count: " + currentFrameNumber;
+                var p = document.getElementById("rectangleCount");
+                p.innerText = "Rectangles Count: " + sceneList.length;
+            }
+            console.log(currentFrameNumber);
         </script>
         <body onload="init()">
             <canvas id="myCanvas" style="border:1px solid gray;"></canvas>
             <br>
-            <button>Change Spawn Color</button>
-            <p>Frame Count: 0</p>
-            <p>Rectangle Count: 0</p>
+            <p id="frameCount">Frame Count: 0</p>
+            <p id="rectangleCount">Rectangle Count: 0</p>
         </body>
     </head>
 </html>
