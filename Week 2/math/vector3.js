@@ -131,11 +131,18 @@ Vector3.prototype = {
     }
     // todo - return the vector that goes from "fromPoint" to "toPoint"
     //        NOTE - "fromPoint" and "toPoint" should not be altered
+    const x = toPoint.x - fromPoint.x;
+    const y = toPoint.y - fromPoint.y;
+    const z = toPoint.z - fromPoint.z;
+    return new Vector3(x, y, z);
   },
 
   //----------------------------------------------------------------------------- 
   rescale: function(newScale) {
     // todo - Change this vector's length to be newScale
+    const currentScale = this.length();
+    const scaleFactor = newScale / currentScale;
+    this.multiplyScalar(scaleFactor);
     return this;
   },
 
@@ -143,7 +150,11 @@ Vector3.prototype = {
   angle: function(v1, v2) {
     // todo - calculate the angle in degrees between vectors v1 and v2. Do NOT
     //        change any values on the vectors themselves
-    return 0;
+    const dot1= v1.dot(v2);
+    const l1 = v1.length();
+    const l2 = v2.length();
+    const angle = (Math.acos((dot1)/(l1 * l2))) * 180/Math.PI;
+    return angle;
   },
 
   //----------------------------------------------------------------------------- 
@@ -152,6 +163,16 @@ Vector3.prototype = {
     //        but whose length is the projection of "vectorToProject" onto "otherVector"
     //        NOTE - "vectorToProject" and "otherVector" should NOT be altered (i.e. use clone)
     //        See "Vector Projection Slides" under "Extras" for more info.
+    var clonedVector = otherVector.clone();
+    const dotProduct = vectorToProject.dot(clonedVector);
+    const magnitude = otherVector.length();
+    const scalar = (dotProduct / (magnitude*magnitude));
+    clonedVector = clonedVector.multiplyScalar(scalar);
+    console.log(dotProduct);
+    console.log(magnitude);
+    console.log(scalar)
+    console.log(clonedVector);
+    return clonedVector;
 
   }
 };
