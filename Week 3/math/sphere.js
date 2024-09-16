@@ -90,12 +90,12 @@ Sphere.prototype = {
     }
 
     // Getting the values of the quadratic formula
-    var difference = r1.origin.subtract(this.center);
-    var a = r1.direction.dot(r1.direction);
-    var b = 2 * r1.direction.dot(difference);
-    var c = difference.dot(difference) - (this.radius * this.radius);
+    var difference = r1.origin.clone().subtract(this.center);
+    var a = r1.direction.clone().dot(r1.direction);
+    var b = 2 * r1.direction.clone().dot(difference);
+    var c = difference.clone().dot(difference) - (this.radius * this.radius);
     var discriminant = (b * b) - (4 * a * c);
-    var d = r1.origin.subtract(this.center);
+    var d = r1.origin.clone().subtract(this.center);
 
     // Check if ray originates inside the sphere
     if (d.length() < this.radius) {
@@ -121,7 +121,7 @@ Sphere.prototype = {
         t = (-b/(2 * a))
       }
       if (t > 0) {
-        var point = r1.origin.add(r1.direction.multiplyScalar(t));
+        var point = r1.origin.clone().add(r1.direction.multiplyScalar(t));
         var normal = point.clone().subtract(this.center).normalize();
         return {
           hit: true,
