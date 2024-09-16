@@ -92,29 +92,30 @@ Sphere.prototype = {
     // Getting the values of the quadratic formula
     var difference = r1.origin.subtract(this.center);
     var a = r1.direction.dot(r1.direction);
-    var b = r1.direction.multiplyScalar(2)
-    b = b.dot(difference);
+    var b = 2 * r1.direction.dot(difference);
     var c = difference.dot(difference) - (this.radius * this.radius);
     var discriminant = (b * b) - (4 * a * c);
 
+    // Checking value of the discriminant
+    if (discriminant < 0) {
+      return {hit:false};
+    }
 
-    if (discriminant > 0) {
+    if (discriminant >= 0) {
       var t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
       var t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
-
-      var t = Math.min(t1, t2);
 
       if (t1 < 0 && t2 < 0){
         return {hit:false};
       }
-
-      if(t < 0){
-        t = Math.max(t1, t2);
+      var t = t1
+      if(t < 0 || (t2 < t1 && t2 >= 0)){
+        t = t2;
       }
+
       if (t > 0) {
-        var point = r1.origin.add(r1.direction.multiplyScalar(t).normalize());
-        var normal = point.subtract(this.center).normalize();
-        console.log(point)
+        var point = r1.origin.add(r1.direction.multiplyScalar(t));
+        var normal = point.clone().subtract(this.center).normalize();
         return {
           hit: true,
           point: point,
@@ -123,7 +124,6 @@ Sphere.prototype = {
         }
       }
     }
-      return { hit: false }
   }
 }
 

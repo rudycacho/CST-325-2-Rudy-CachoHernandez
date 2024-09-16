@@ -80,9 +80,9 @@ Vector3.prototype = {
     // todo - subtract v from 'this' vector
     // This SHOULD change the values of this.x, this.y, and this.z
 
-    this.x = this.x + v.x;
-    this.y = this.y + v.y;
-    this.z = this.z + v.z;
+    this.x = this.x - v.x;
+    this.y = this.y - v.y;
+    this.z = this.z - v.z;
     return this;
   },
 
