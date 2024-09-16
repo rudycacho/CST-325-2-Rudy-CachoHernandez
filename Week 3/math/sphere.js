@@ -95,6 +95,12 @@ Sphere.prototype = {
     var b = 2 * r1.direction.dot(difference);
     var c = difference.dot(difference) - (this.radius * this.radius);
     var discriminant = (b * b) - (4 * a * c);
+    var d = r1.origin.subtract(this.center);
+
+    // Check if ray originates inside the sphere
+    if (d.length() < this.radius) {
+      return {hit:false}
+    }
 
     // Checking value of the discriminant
     if (discriminant < 0) {
@@ -104,7 +110,6 @@ Sphere.prototype = {
     if (discriminant >= 0) {
       var t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
       var t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
-
       if (t1 < 0 && t2 < 0){
         return {hit:false};
       }
@@ -112,7 +117,9 @@ Sphere.prototype = {
       if(t < 0 || (t2 < t1 && t2 >= 0)){
         t = t2;
       }
-
+      if(discriminant == 0){
+        t = (-b/(2 * a))
+      }
       if (t > 0) {
         var point = r1.origin.add(r1.direction.multiplyScalar(t));
         var normal = point.clone().subtract(this.center).normalize();
