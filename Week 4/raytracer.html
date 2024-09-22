@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
 	<meta charset="utf-8">
 	<title>Raytracer</title>
 </head>
 <body>
-<canvas id='my-canvas'><canvas>
+<canvas id='my-canvas'></canvas>
 
 <script src='math/vector3.js'></script>
 <script src='math/ray.js'></script>
@@ -38,13 +38,13 @@ var imageData = canvasContext.getImageData(0, 0, pixelsAcross, pixelsDown);
 
 // Raytracer scene data setup
 var fov = 45;   // if this changes, your code should still work
-var fovRadians; // todo -> convert degrees to radians
+var fovRadians = fov * (Math.PI/180);
 
-var pixelWidth; // todo -> what's the size of a pixel from left to right?
-var pixelHalfWidth; // todo -> half of the pixel width
+var pixelWidth = 3 / pixelsAcross; // todo -> what's the size of a pixel from left to right?
+var pixelHalfWidth = pixelWidth / 2; // todo -> half of the pixel width
 
 // How far away (scalar) the eye is from the image plane (see project guide for more info)
-var eyeDistance; // = todo -> hint: related to tangent and field of view
+var eyeDistance = 1 / (Math.tan((fov/2))); // = todo -> hint: related to tangent and field of view
 // -----------
 // |         /
 // |        /
@@ -65,8 +65,8 @@ var eyeCoordinate = new Vector3(0, 0, eyeDistance); // all of your rays will use
 // They also provide a "raycast" function that you can pass a ray to
 // in order to find intersection between the ray and the object
 
-var sphere; // todo = new Sphere(..., ...);
-var plane; // todo = new Plane(..., ...);
+var sphere = new Sphere((0,0,0),.25); // todo = new Sphere(..., ...);
+var plane = new Plane((0,1,0),(0,-0.25,0)); // todo = new Plane(..., ...);
 
 // end of raytracer setup ******************************************************
 
