@@ -44,7 +44,7 @@ var pixelWidth = 3 / pixelsAcross; // todo -> what's the size of a pixel from le
 var pixelHalfWidth = pixelWidth / 2; // todo -> half of the pixel width
 
 // How far away (scalar) the eye is from the image plane (see project guide for more info)
-var eyeDistance = 1 / (Math.tan((fov/2))); // = todo -> hint: related to tangent and field of view
+var eyeDistance = 1 / (Math.tan((fovRadians/2))); // = todo -> hint: related to tangent and field of view
 // -----------
 // |         /
 // |        /
@@ -65,8 +65,8 @@ var eyeCoordinate = new Vector3(0, 0, eyeDistance); // all of your rays will use
 // They also provide a "raycast" function that you can pass a ray to
 // in order to find intersection between the ray and the object
 
-var sphere = new Sphere((0,0,0),.25); // todo = new Sphere(..., ...);
-var plane = new Plane((0,1,0),(0,-0.25,0)); // todo = new Plane(..., ...);
+var sphere = new Sphere(new Vector3(0,0,0),.25); // todo = new Sphere(..., ...);
+var plane = new Plane(new Vector3(0,1,0),new Vector3(0,-0.25,0)); // todo = new Plane(..., ...);
 
 // end of raytracer setup ******************************************************
 
@@ -77,10 +77,10 @@ function generateRayForPixel(xPixelIndex, yPixelIndex) {
 	var pixelY = 1 - pixelHalfWidth - pixelWidth * yPixelIndex;
 	var pixelCoordinate = new Vector3(pixelX, pixelY, 0);
 
-	var direction; // = vector from the eye to the pixel
+	var direction = new Vector3().fromTo(eyeCoordinate,pixelCoordinate); // = vector from the eye to the pixel
 
 	// Creates a ray from the eye toward the pixelCoordinate
-	var pixelRay; // = new Ray(...);
+	var pixelRay = new Ray(eyeCoordinate,direction); // = new Ray(...);
 	return pixelRay;
 }
 
@@ -102,7 +102,11 @@ function updateAndRender(timeElapsed) {
 		for (var xPixelIndex = 0; xPixelIndex < pixelsAcross; ++xPixelIndex) {
 
 			// Uncomment this once you've coded generateRayForPixel
-			//var pixelRay = generateRayForPixel(xPixelIndex, yPixelIndex);
+			var pixelRay = generateRayForPixel(xPixelIndex, yPixelIndex);
+
+			var maxValue = Math.sin(Math.sqrt(2)/4);
+
+			setPixelColor(xPixelIndex, yPixelIndex,Math.abs(pixelRay.direction.x) / maxValue)
 
 			// See if the ray intersects the sphere or the plane (or every object in our scene)
 			// Uncomment when your sphere or plane code is ready
@@ -112,7 +116,7 @@ function updateAndRender(timeElapsed) {
 			// determine which hit object is the closest (in case there is more than 1 hit)
 
 			//if we hit something {
-				setPixelColor(xPixelIndex, yPixelIndex, 0.5); // middle gray
+			//	setPixelColor(xPixelIndex, yPixelIndex, 0.5); // middle gray
 			//} else {
 				// we didn't hit anything, choose an appropriate backbround color
 				// setPixelColor(xPixelIndex, yPixelIndex, 0.1); // dark gray
