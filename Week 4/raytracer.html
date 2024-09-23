@@ -100,30 +100,39 @@ function updateAndRender(timeElapsed) {
   // last time you call it will be the color and overwrite previous calls.
 	for (var yPixelIndex = 0; yPixelIndex < pixelsDown; ++yPixelIndex) {
 		for (var xPixelIndex = 0; xPixelIndex < pixelsAcross; ++xPixelIndex) {
-
 			// Uncomment this once you've coded generateRayForPixel
 			var pixelRay = generateRayForPixel(xPixelIndex, yPixelIndex);
+			var lightPos = new Vector3(1,0,0);
+			var lightDirection;
 
 			// See if the ray intersects the sphere or the plane (or every object in our scene)
-
+			var normalDotLight;
 			// Uncomment when your sphere or plane code is ready
 			var sphereResult = sphere.raycast(pixelRay);
 			var planeResult = plane.raycast(pixelRay);
 			// determine which hit object is the closest (in case there is more than 1 hit)
 
 			if (sphereResult.hit == true) {
-					setPixelColor(xPixelIndex, yPixelIndex, 0.8);
+				lightDirection = new Vector3().fromTo(sphereResult.point, lightPos)
+				normalDotLight = sphereResult.normal.dot(lightDirection.normalize());
+					setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
 			}
 			if (planeResult.hit == true) {
-				setPixelColor(xPixelIndex, yPixelIndex, 0.5);
+				lightDirection = new Vector3().fromTo(planeResult.point, lightPos)
+				normalDotLight = planeResult.normal.dot(lightDirection.normalize());
+				setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
 			}
 
 			if (sphereResult.hit == true && planeResult.hit == true){
 				if (sphereResult.distance < planeResult.distance){
-					setPixelColor(xPixelIndex, yPixelIndex, 0.8);
+					lightDirection = new Vector3().fromTo(sphereResult.point, lightPos)
+					normalDotLight = sphereResult.normal.dot(lightDirection.normalize());
+					setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
 				}
 				if (sphereResult.distance > planeResult.distance){
-					setPixelColor(xPixelIndex, yPixelIndex, 0.5);
+					lightDirection = new Vector3().fromTo(planeResult.point, lightPos)
+					normalDotLight = planeResult.normal.dot(lightDirection.normalize());
+					setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
 				}
 			}
 			if (sphereResult.hit == false && planeResult.hit == false){
