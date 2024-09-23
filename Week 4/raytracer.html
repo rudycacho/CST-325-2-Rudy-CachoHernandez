@@ -40,7 +40,7 @@ var imageData = canvasContext.getImageData(0, 0, pixelsAcross, pixelsDown);
 var fov = 45;   // if this changes, your code should still work
 var fovRadians = fov * (Math.PI/180);
 
-var pixelWidth = 3 / pixelsAcross; // todo -> what's the size of a pixel from left to right?
+var pixelWidth = 2 / pixelsAcross; // todo -> what's the size of a pixel from left to right?
 var pixelHalfWidth = pixelWidth / 2; // todo -> half of the pixel width
 
 // How far away (scalar) the eye is from the image plane (see project guide for more info)
@@ -104,23 +104,31 @@ function updateAndRender(timeElapsed) {
 			// Uncomment this once you've coded generateRayForPixel
 			var pixelRay = generateRayForPixel(xPixelIndex, yPixelIndex);
 
-			var maxValue = Math.sin(Math.sqrt(2)/4);
-
-			setPixelColor(xPixelIndex, yPixelIndex,Math.abs(pixelRay.direction.x) / maxValue)
-
 			// See if the ray intersects the sphere or the plane (or every object in our scene)
-			// Uncomment when your sphere or plane code is ready
-			//var sphereResult = sphere.raycast(pixelRay);
-			//var planeResult = plane.raycast(pixelRay);
 
+			// Uncomment when your sphere or plane code is ready
+			var sphereResult = sphere.raycast(pixelRay);
+			var planeResult = plane.raycast(pixelRay);
 			// determine which hit object is the closest (in case there is more than 1 hit)
 
-			//if we hit something {
-			//	setPixelColor(xPixelIndex, yPixelIndex, 0.5); // middle gray
-			//} else {
-				// we didn't hit anything, choose an appropriate backbround color
-				// setPixelColor(xPixelIndex, yPixelIndex, 0.1); // dark gray
-			//}
+			if (sphereResult.hit == true) {
+					setPixelColor(xPixelIndex, yPixelIndex, 0.8);
+			}
+			if (planeResult.hit == true) {
+				setPixelColor(xPixelIndex, yPixelIndex, 0.5);
+			}
+
+			if (sphereResult.hit == true && planeResult.hit == true){
+				if (sphereResult.distance < planeResult.distance){
+					setPixelColor(xPixelIndex, yPixelIndex, 0.8);
+				}
+				if (sphereResult.distance > planeResult.distance){
+					setPixelColor(xPixelIndex, yPixelIndex, 0.5);
+				}
+			}
+			if (sphereResult.hit == false && planeResult.hit == false){
+				setPixelColor(xPixelIndex, yPixelIndex, 0.1)
+			}
 		}
 	}
 
