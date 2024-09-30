@@ -99,6 +99,9 @@ function updateAndRender(timeElapsed) {
   // Go through every pixel
   // NOTE! You should only call setPixelColor once per pixel.  Otherwise, the
   // last time you call it will be the color and overwrite previous calls.
+	var seconds = timeElapsed * .001;
+	lightPos.x = Math.cos(seconds);
+	lightPos.z = Math.sin(seconds);
 	for (var yPixelIndex = 0; yPixelIndex < pixelsDown; ++yPixelIndex) {
 		for (var xPixelIndex = 0; xPixelIndex < pixelsAcross; ++xPixelIndex) {
 			// Uncomment this once you've coded generateRayForPixel
