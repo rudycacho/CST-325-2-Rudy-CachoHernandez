@@ -5,20 +5,19 @@
  * @param radius A Number representing the radius of the sphere.
  */
 
-var Sphere = function(center, radius) {
+var Sphere = function(center, radius, color) {
   if (!(this instanceof Sphere)) {
     console.error("Sphere constructor must be called with the new operator");
   }
 
-  this.center = center;
-  this.radius = radius;
- /* this.color = color;
-*/
-  if (center == undefined || radius == undefined) {
+  if (center == undefined || radius == undefined ) {
     this.center = new Vector3();
     this.radius = 1;
+    this.color = new Vector3();
   }
-
+  if (color === undefined) {
+    color = new Vector3(1,1,1);
+  }
   if (!(this.center instanceof Vector3)) {
     console.error("The sphere center must be a Vector3");
   }
@@ -29,6 +28,9 @@ var Sphere = function(center, radius) {
   if (!(this.color instanceof Vector3)) {
     console.error("The color must be a Vector3");
   }
+  this.center = center;
+  this.radius = radius;
+  this.color = color;
 };
 
 Sphere.prototype = {

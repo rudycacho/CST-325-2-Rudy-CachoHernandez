@@ -65,16 +65,16 @@ var eyeCoordinate = new Vector3(0, 0, eyeDistance); // all of your rays will use
 // They also provide a "raycast" function that you can pass a ray to
 // in order to find intersection between the ray and the object
 var lightPos = new Vector3(1,0,0);
-var sphere = new Sphere(new Vector3(0,0,0),.25); // todo = new Sphere(..., ...);
-var floor = new Plane(new Vector3(0,1,0),new Vector3(0,-0.25,0)); // todo = new Plane(..., ...);
-var leftWall = new Plane(new Vector3(1,0,0), new Vector3(-1,0,0));
-var rightWall = new Plane(new Vector3(-1,0,0), new Vector3(1,0,0));
-var ceiling = new Plane(new Vector3(0,-1,0), new Vector3(0,1,0));
+var sphere = new Sphere(new Vector3(0,0,0),.25);
+var floor = new Plane(new Vector3(0,1,0),new Vector3(0,-0.25,0));
+var leftWall = new Plane(new Vector3(1,0,0), new Vector3(-1.2,0,0), new Vector3(255,0,0));
+var rightWall = new Plane(new Vector3(-1,0,0), new Vector3(1.2,0,0), new Vector3(0,255,0));
+var ceiling = new Plane(new Vector3(0,-1,0), new Vector3(0,1.2,0));
 var backWall = new Plane(new Vector3(0,0,1), new Vector3(0,0,-2));
 
 
-
 var scene = [sphere,floor,leftWall,rightWall,ceiling,backWall];
+var sceneCount = scene.length
 
 
 // end of raytracer setup ******************************************************
@@ -94,11 +94,11 @@ function generateRayForPixel(xPixelIndex, yPixelIndex) {
 }
 
 // -----------------------------------------------------------------------------
-function setPixelColor(xPixelIndex, yPixelIndex, shadeOfGray /*[0,1]*/) {
+function setPixelColor(xPixelIndex, yPixelIndex, color /*[0,1]*/) {
 	var index = (yPixelIndex * pixelsAcross + xPixelIndex) * 4; // 4 bytes per pixel
-	imageData.data[index + 0] = shadeOfGray * 255; // red channel
-	imageData.data[index + 1] = shadeOfGray * 255; // green channel
-	imageData.data[index + 2] = shadeOfGray * 255; // blue channel
+	imageData.data[index + 0] = color.x * 255; // red channel
+	imageData.data[index + 1] = color.y * 255; // green channel
+	imageData.data[index + 2] = color.z * 255; // blue channel
 	imageData.data[index + 3] = 255;
 }
 
@@ -116,42 +116,45 @@ function updateAndRender(timeElapsed) {
 
 			var normal
 			var intersection;
-
 			var closestDistance = Infinity;
 			var closestObject;
 
-			for (var i = 0; i < scene.length; i++){
-				var object = scene[i];
+			// Find the closest object
+			for (var i = 0; i < sceneCount; i++){
+				var object = scene.at(i);
 				var result = object.raycast(pixelRay);
-
 				if (result.hit && result.distance < closestDistance){
-					closestDistance = result.distance;
 					closestObject = object;
+					closestDistance = result.distance;
 					intersection = result.point;
 					normal = result.normal;
 				}
 			}
-
+			// Object loop
 			if (closestObject != null){
-				var shadowRayDirection = lightPos.clone().subtract(intersection).normalize();
-				var shadowRay = new Ray(intersection, shadowRayDirection);
+				var objectColor = closestObject.color;
+				var shadowDirection = lightPos.clone().subtract(intersection).normalize();
+				var shadowRay = new Ray(intersection, shadowDirection);
 				var inShadow = false;
 
-				for (var j = 0; j < scene.length; j++){
-					var shadowResult = scene.at(j).raycast(shadowRay);
+				// Checks if object is in shadow
+				for (var i = 0; i < sceneCount; i++){
+					var shadowResult = scene.at(i).raycast(shadowRay);
+					//
 					if (shadowResult.hit && shadowResult.distance < lightPos.clone().subtract(intersection).length()){
 						inShadow = true;
 						break;
 					}
 				}
-				// Checks if its in shadow
+				// Pixel Color setting
 				if (inShadow){
-					setPixelColor(xPixelIndex,yPixelIndex,.01);
+					setPixelColor(xPixelIndex,yPixelIndex,new Vector3(0,0,0));
 				} else{
 					var lightDirection = new Vector3().fromTo(intersection, lightPos).normalize();
 					var normalDotLight = normal.dot(lightDirection);
-					setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
+					setPixelColor(xPixelIndex, yPixelIndex, objectColor.clone().multiplyScalar(normalDotLight));
 				}
+				// No hit occurred
 			} else{
 				setPixelColor(xPixelIndex,yPixelIndex,.1);
 			}
