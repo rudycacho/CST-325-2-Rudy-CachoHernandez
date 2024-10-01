@@ -12,7 +12,8 @@ var Sphere = function(center, radius) {
 
   this.center = center;
   this.radius = radius;
-
+ /* this.color = color;
+*/
   if (center == undefined || radius == undefined) {
     this.center = new Vector3();
     this.radius = 1;
@@ -24,6 +25,9 @@ var Sphere = function(center, radius) {
 
   if ((typeof(this.radius) != 'number')) {
     console.error("The radius must be a Number");
+  }
+  if (!(this.color instanceof Vector3)) {
+    console.error("The color must be a Vector3");
   }
 };
 

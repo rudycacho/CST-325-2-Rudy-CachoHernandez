@@ -61,13 +61,21 @@ var eyeCoordinate = new Vector3(0, 0, eyeDistance); // all of your rays will use
 
 // Define the scene objects here ------------------
 
-// These are 3d definitions that match all of the math we did in class
+// These are 3d definitions that match all the math we did in class
 // They also provide a "raycast" function that you can pass a ray to
 // in order to find intersection between the ray and the object
-
-var sphere = new Sphere(new Vector3(0,0,0),.25); // todo = new Sphere(..., ...);
-var plane = new Plane(new Vector3(0,1,0),new Vector3(0,-0.25,0)); // todo = new Plane(..., ...);
 var lightPos = new Vector3(1,0,0);
+var sphere = new Sphere(new Vector3(0,0,0),.25); // todo = new Sphere(..., ...);
+var floor = new Plane(new Vector3(0,1,0),new Vector3(0,-0.25,0)); // todo = new Plane(..., ...);
+var leftWall = new Plane(new Vector3(1,0,0), new Vector3(-1,0,0));
+var rightWall = new Plane(new Vector3(-1,0,0), new Vector3(1,0,0));
+var ceiling = new Plane(new Vector3(0,-1,0), new Vector3(0,1,0));
+var backWall = new Plane(new Vector3(0,0,1), new Vector3(0,0,-2));
+
+
+
+var scene = [sphere,floor,leftWall,rightWall,ceiling,backWall];
+
 
 // end of raytracer setup ******************************************************
 
@@ -104,42 +112,48 @@ function updateAndRender(timeElapsed) {
 	lightPos.z = Math.sin(seconds);
 	for (var yPixelIndex = 0; yPixelIndex < pixelsDown; ++yPixelIndex) {
 		for (var xPixelIndex = 0; xPixelIndex < pixelsAcross; ++xPixelIndex) {
-			// Uncomment this once you've coded generateRayForPixel
 			var pixelRay = generateRayForPixel(xPixelIndex, yPixelIndex);
-			var lightDirection;
 
-			// See if the ray intersects the sphere or the plane (or every object in our scene)
-			var normalDotLight;
-			// Uncomment when your sphere or plane code is ready
-			var sphereResult = sphere.raycast(pixelRay);
-			var planeResult = plane.raycast(pixelRay);
-			// determine which hit object is the closest (in case there is more than 1 hit)
+			var normal
+			var intersection;
 
-			if (sphereResult.hit == true) {
-				lightDirection = new Vector3().fromTo(sphereResult.point, lightPos)
-				normalDotLight = sphereResult.normal.dot(lightDirection.normalize());
-					setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
-			}
-			if (planeResult.hit == true) {
-				lightDirection = new Vector3().fromTo(planeResult.point, lightPos)
-				normalDotLight = planeResult.normal.dot(lightDirection.normalize());
-				setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
-			}
+			var closestDistance = Infinity;
+			var closestObject;
 
-			if (sphereResult.hit == true && planeResult.hit == true){
-				if (sphereResult.distance < planeResult.distance){
-					lightDirection = new Vector3().fromTo(sphereResult.point, lightPos)
-					normalDotLight = sphereResult.normal.dot(lightDirection.normalize());
-					setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
-				}
-				if (sphereResult.distance > planeResult.distance){
-					lightDirection = new Vector3().fromTo(planeResult.point, lightPos)
-					normalDotLight = planeResult.normal.dot(lightDirection.normalize());
-					setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
+			for (var i = 0; i < scene.length; i++){
+				var object = scene[i];
+				var result = object.raycast(pixelRay);
+
+				if (result.hit && result.distance < closestDistance){
+					closestDistance = result.distance;
+					closestObject = object;
+					intersection = result.point;
+					normal = result.normal;
 				}
 			}
-			if (sphereResult.hit == false && planeResult.hit == false){
-				setPixelColor(xPixelIndex, yPixelIndex, 0.1)
+
+			if (closestObject != null){
+				var shadowRayDirection = lightPos.clone().subtract(intersection).normalize();
+				var shadowRay = new Ray(intersection, shadowRayDirection);
+				var inShadow = false;
+
+				for (var j = 0; j < scene.length; j++){
+					var shadowResult = scene.at(j).raycast(shadowRay);
+					if (shadowResult.hit && shadowResult.distance < lightPos.clone().subtract(intersection).length()){
+						inShadow = true;
+						break;
+					}
+				}
+				// Checks if its in shadow
+				if (inShadow){
+					setPixelColor(xPixelIndex,yPixelIndex,.01);
+				} else{
+					var lightDirection = new Vector3().fromTo(intersection, lightPos).normalize();
+					var normalDotLight = normal.dot(lightDirection);
+					setPixelColor(xPixelIndex, yPixelIndex, normalDotLight);
+				}
+			} else{
+				setPixelColor(xPixelIndex,yPixelIndex,.1);
 			}
 		}
 	}

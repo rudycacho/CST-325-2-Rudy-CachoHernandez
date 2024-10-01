@@ -24,7 +24,6 @@ var Plane = function(normal, validPoint) {
   if (!(validPoint instanceof Vector3)) {
     console.error("The plane valid point must be a Vector3");
   }
-
 	this.normal = normal.clone().normalize();
 	this.validPoint = validPoint;
 }
