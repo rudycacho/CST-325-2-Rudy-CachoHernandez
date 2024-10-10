@@ -53,6 +53,9 @@ Matrix4.prototype = {
   // -------------------------------------------------------------------------
   makeIdentity: function() {
     // todo make this matrix be the identity matrix
+    for (var i = 0; i < 16; i++) {
+        this.elements[i] = (i % 4 === Math.floor(i / 4)) ? 1 : 0;
+    }
     return this;
   },
 
@@ -74,6 +77,30 @@ Matrix4.prototype = {
     // todo
     // set the result vector values to be the result of multiplying the
     // vector v by 'this' matrix
+    // this is so scuffed :(
+    var sumX = 0;
+    var sumY = 0;
+    var sumZ = 0;
+    var sumW = 0;
+    var e = [v.x, v.y, v.z, v.w];
+    // X
+    for (var i = 0; i < 4; i++) {
+      sumX = sumX + (this.getElement(0,i) * e[i])
+    }
+    // Y
+    for (var j = 0; j < 4; j++) {
+      sumY = sumY + (this.getElement(1,j) * e[j])
+    }
+    // Z
+    for (var k = 0; k < 4; k++) {
+      sumZ = sumZ + (this.getElement(2,k)* e[k])
+    }
+    // W
+    for (var l = 0; l < 4; l++) {
+      sumW = sumW + (this.getElement(3,l) * e[l])
+    }
+
+    result.set(sumX,sumY,sumZ,sumW);
     return result;
   },
 
@@ -85,6 +112,23 @@ Matrix4.prototype = {
     }
 
     // todo - multiply 'this' * rightSideMatrix
+    // Make blank result
+    var e = []
+    for(var i = 0; i < 16; i++){
+      e[i] = 0
+    }
+    // Multiplication
+    for (var i = 0; i < 4; i++) {
+      for (var j = 0; j < 4; j++) {
+        for (var k = 0; k < 4; k++) {
+          e[i * 4 + j] += this.getElement(i,k) * rightSideMatrix.getElement(k,j);
+        }
+      }
+    }
+    // Set result as matrix
+    for(var i = 0; i < 16; i++){
+      this.elements[i] = e[i]
+    }
     return this;
   },
 
@@ -97,18 +141,41 @@ Matrix4.prototype = {
   // -------------------------------------------------------------------------
   makeScale: function(x, y, z) {
     // todo make this matrix into a pure scale matrix based on (x, y, z)
+
+    // Zeroing
+    for (var i = 0; i < 16; i++) {
+      this.elements[i] = 0;
+    }
+    // XYZ
+    this.elements[0] = x;
+    this.elements[5] = y;
+    this.elements[10] = z;
+    // Setting last element
+    this.elements[15] = 1;
+
     return this;
   },
 
   // -------------------------------------------------------------------------
   makeRotationX: function(degrees) {
     // todo - convert to radians
-    // var radians = ...
+    var radians = degrees * (Math.PI /180)
 
     // shortcut - use in place of this.elements
     var e = this.elements;
-
+    // Making it zero
+    for (var i = 0; i < 16; i++) {
+      e[i] = 0;
+    }
     // todo - set every element of this matrix to be a rotation around the x-axis
+    e[0] = 1;
+    e[5] = Math.cos(radians);
+    e[6] = -(Math.sin(radians));
+    e[9] = Math.sin(radians);
+    e[10] = Math.cos(radians);
+    e[15] = 1;
+
+    this.elements = e;
 
     return this;
   },
@@ -116,25 +183,40 @@ Matrix4.prototype = {
   // -------------------------------------------------------------------------
   makeRotationY: function(degrees) {
     // todo - convert to radians
-    // var radians = ...
+    var radians = degrees * (Math.PI /180)
 
     // shortcut - use in place of this.elements
     var e = this.elements;
-
+    for (var i = 0; i < 16; i++) {
+      e[i] = 0;
+    }
     // todo - set every element of this matrix to be a rotation around the y-axis
-
+    e[0] = Math.cos(radians);
+    e[2] = Math.sin(radians);
+    e[5] = 1;
+    e[8] = -Math.sin(radians);
+    e[10] = Math.cos(radians);
+    e[15] = 1;
     return this;
   },
 
   // -------------------------------------------------------------------------
   makeRotationZ: function(degrees) {
     // todo - convert to radians
-    // var radians = ...
+    var radians = degrees * (Math.PI /180)
 
     // shortcut - use in place of this.elements
     var e = this.elements;
-
+    for (var i = 0; i < 16; i++) {
+      e[i] = 0;
+    }
     // todo - set every element of this matrix to be a rotation around the z-axis
+    e[0] = (Math.cos(radians));
+    e[1] = -(Math.sin(radians));
+    e[4] = Math.sin(radians);
+    e[5] = Math.cos(radians);
+    e[10] = 1;
+    e[15] = 1;
     return this;
   },
 
