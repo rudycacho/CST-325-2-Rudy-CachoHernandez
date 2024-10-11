@@ -225,12 +225,21 @@ Matrix4.prototype = {
     // todo - wipe out the existing matrix and make it a pure translation
     //      - If arg1 is a Vector3 or Vector4, use its components and ignore
     //        arg2 and arg3. O.W., treat arg1 as x, arg2 as y, and arg3 as z
+    this.makeIdentity();
+    var e = this.elements;
     if (arg1 instanceof Vector4) {
-      //...
+      e[3] = arg1.x;
+      e[7] = arg1.y;
+      e[11] = arg1.z;
+      e[15] = arg1.w;
     } else if (arg1 instanceof Vector3) {
-      //...
+      e[3] = arg1.x;
+      e[7] = arg1.y;
+      e[11] = arg1.z;
     } else {
-      //...
+      e[3] = arg1;
+      e[7] = arg2;
+      e[11] = arg3;
     }
     return this;
   },
@@ -238,15 +247,23 @@ Matrix4.prototype = {
   // -------------------------------------------------------------------------
   makePerspective: function(fovy, aspect, near, far) {
     // todo - convert fovy to radians
-    // var fovyRads = ...
+    var fovyRads = fovy * (Math.PI /180)
 
     // todo -compute t (top) and r (right)
+    var t = near * Math.tan(fovyRads/2);
+    var r = t * aspect;
 
     // shortcut - use in place of this.elements
     var e = this.elements;
-
+    for (var i = 0; i < 16; i++) {
+      e[i] = 0;
+    }
     // todo - set every element to the appropriate value
-
+    e[0] = near/r;
+    e[5] = near/t;
+    e[10] = (-(far + near)/(far - near));
+    e[11] = ((-2*far*near)/(far - near));
+    e[14] = -1;
     return this;
   },
 
@@ -254,9 +271,17 @@ Matrix4.prototype = {
   makeOrthographic: function(left, right, top, bottom, near, far) {
     // shortcut - use in place of this.elements
     var e = this.elements;
-
+    for (var i = 0; i < 16; i++) {
+      e[i] = 0;
+    }
     // todo - set every element to the appropriate value
-
+    e[0] = (2 / (right - left));
+    e[3] = -((right + left) / (right - left));
+    e[5] = 2/(top - bottom);
+    e[7] = -((top + bottom) / (top - bottom));
+    e[10] = -2/(far - near);
+    e[11] = -((far + near) / (far - near));
+    e[15] = 1;
     return this;
   },
 
