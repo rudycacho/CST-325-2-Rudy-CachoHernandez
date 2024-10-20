@@ -10,7 +10,7 @@
 	<!-- vertex shader - Our part in the geometry processing part of the pipeline happens here -->
 	<script id="shader-vs" type="x-shader/x-vertex">
     attribute vec3 aVertexPosition;
-    // todo #8
+   	attribute vec3 aVertexColor;
 
     uniform mat4 uWorldMatrix;
     uniform mat4 uViewMatrix;
@@ -27,8 +27,10 @@
 
         // todo #8
         vColor = vec3(0.0, 0.0, 0.0);
+        vColor = aVertexColor;
+
     }
-</script>
+	</script>
 
 	<!-- fragment shader - Pixel color is determined here -->
 	<script id="shader-fs" type="x-shader/x-fragment">
@@ -141,8 +143,9 @@
 			shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
 			gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
 
-			// todo #9
 			// Get a reference to the color attribute variable in the vertex shader and enable it
+			shaderProgram.vertexColorAttribute = gl.getAttribLocation(shaderProgram, "aVertexColor");
+			gl.enableVertexAttribArray(shaderProgram.vertexColorAttribute)
 
 			shaderProgram.worldMatrixUniform = gl.getUniformLocation(shaderProgram, "uWorldMatrix");
 			shaderProgram.viewMatrixUniform = gl.getUniformLocation(shaderProgram, "uViewMatrix");
@@ -245,8 +248,9 @@
 		}
 
 		// -------------------------------------------------------------------------
-		function updateAndRender() {
+		function updateAndRender(timeElapsed) {
 			requestAnimationFrame(updateAndRender);
+			var seconds = timeElapsed * .001;
 
 			// specify what portion of the canvas we want to draw to (all of it, full width and height)
 			// uncomment when ready to implement
@@ -255,8 +259,8 @@
 			// this is a new frame so let's clear out whatever happened last frame
 			gl.clearColor(0.707, 0.707, 1, 1.0);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-			renderTriangle(0);
+			renderTriangle(seconds);
+			time.secondsElapsedSinceStart++;
 			// renderLines();
 		}
 
@@ -267,12 +271,16 @@
 			var degrees = secondsElapsedSinceStart * 60;
 
 			// todo #11 - make the triangle rotate
+			var rotateY = new Matrix4().makeRotationY(degrees);
 
 			// 1. update the triangle geometry world matrix here (used to place the triangle into world space)
 			// 2. reset view matrix to identity
 			// 3. set the projection matrix using values from online guide
 			triangleGeometry.worldMatrix.makeIdentity();
 			triangleGeometry.worldMatrix.makeTranslation(0,0,-7);
+			triangleGeometry.worldMatrix.multiply(rotateY);
+
+
 			projectionMatrix.makePerspective(45,(gl.canvasWidth / gl.canvasHeight),0.1,1000)
 
 			gl.bindBuffer(gl.ARRAY_BUFFER, triangleGeometry.positionBuffer);
@@ -285,8 +293,15 @@
 				0  // offset - used for mixing data in a single buffer, ignore
 			);
 
-			// todo #10 - map the color buffer similar to the position buffer above
-
+			gl.bindBuffer(gl.ARRAY_BUFFER, triangleGeometry.colorBuffer);
+			gl.vertexAttribPointer(
+				triangleGeometry.shaderProgram.vertexColorAttribute,
+				3,
+				gl.FLOAT,
+				gl.FALSE,
+				0,
+				0
+			);
 			// Send our matrices to the shader
 			gl.uniformMatrix4fv(shaderProgram.worldMatrixUniform, false, triangleGeometry.worldMatrix.clone().transpose().elements);
 			gl.uniformMatrix4fv(shaderProgram.viewMatrixUniform, false, viewMatrix.clone().transpose().elements);
