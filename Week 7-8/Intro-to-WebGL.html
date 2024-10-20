@@ -80,9 +80,7 @@
 		function initializeAndStartRendering() {
 			initGL();
 
-			// todo #3
-			// uncomment when directed by the guide
-			// createShaders();
+			createShaders();
 
 			createTriangleGeometry();
 
@@ -114,30 +112,22 @@
 
 		// -------------------------------------------------------------------------
 		function createShaders() {
-			// todo #3
 			// Get the objects representing individual shaders
-			var vertexShaderText = document.getElementById(/* todo #3 - choose correct id*/).textContent;
+			var vertexShaderText = document.getElementById("shader-vs").textContent;
 
-			// todo #3
-			var fragmentShaderText = document.getElementById(/* todo #3 - choose the correct id*/).textContent;
+			var fragmentShaderText = document.getElementById("shader-fs").textContent;
 
-			// todo #4 - uncomment when directed
-			// var vertexShader = createCompiledShader(gl, vertexShaderText, gl.VERTEX_SHADER);
+			var vertexShader = createCompiledShader(gl, vertexShaderText, gl.VERTEX_SHADER);
 
-			// todo #4 - uncomment when directed
-			// var fragmentShader = createCompiledShader(gl, fragmentShaderText, gl.FRAGMENT_SHADER);
+			var fragmentShader = createCompiledShader(gl, fragmentShaderText, gl.FRAGMENT_SHADER);
 
-			// todo #5 - delete the "return" line below when instructed by the guide
-			return;
-
-			// todo #5
 			// Create an empty gl "program" which will be composed of compiled shaders
 			shaderProgram = gl.createProgram();
-			gl.attachShader(shaderProgram, /* todo #5 - arg2*/);
-			gl.attachShader(shaderProgram, /* todo #5 - arg2*/);
+			gl.attachShader(shaderProgram, vertexShader);
+			gl.attachShader(shaderProgram, fragmentShader);
 
 			// Tell gl it's ready to go, link it
-			gl.linkProgram(/* todo #5 - arg1*/);
+			gl.linkProgram(shaderProgram);
 			if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
 				alert("Could not initialise shaders");
 			}
@@ -163,9 +153,9 @@
 		function createCompiledShader(gl, shaderText, shaderType) {
 			var shader = gl.createShader(shaderType);
 
-			// todo #4 - uncomment this when ready to implement
-			// gl.shaderSource(/* todo argument 1*/, /* todo argument 2*/);
-			// gl.compileShader(/* todo argument 1*/);
+
+			gl.shaderSource(shader, shaderText);
+			gl.compileShader(shader);
 
 			if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
 				alert(gl.getShaderInfoLog(shader));
@@ -199,13 +189,17 @@
 			// WebGL needs to know how many vertices we have
 			triangleGeometry.bufferItemCount = 3;
 
-			// todo
-			// 1. create color buffer
-			// 2. bind color buffer
-			// 3. create color array
-			// 4. "buffer" color data
-			// 5. store a reference to the color buffer on the triangleGeometry object
-			//    triangleGeometry.colorBuffer = ??;
+			// Color Buffer Creation
+			var newColorBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, newColorBuffer);
+			var colorArray = [
+				1.0, 0.0, 0.0, // (Red)
+				0.0, 1.0, 0.0, // (Green)
+				0.0, 0.0,1.0  // (Blue)
+			];
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorArray), gl.STATIC_DRAW);
+
+			triangleGeometry.colorBuffer = newColorBuffer;
 		}
 
 		// -------------------------------------------------------------------------
@@ -254,16 +248,15 @@
 		function updateAndRender() {
 			requestAnimationFrame(updateAndRender);
 
-			// todo #2
 			// specify what portion of the canvas we want to draw to (all of it, full width and height)
 			// uncomment when ready to implement
-			// gl.viewport(0, 0, /* width of viewport equal to canvas width*/, /*height of viewport equal to canvas height*/);
+			gl.viewport(0, 0,gl.canvasWidth,gl.canvasHeight);
 
 			// this is a new frame so let's clear out whatever happened last frame
 			gl.clearColor(0.707, 0.707, 1, 1.0);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-			// renderTriangle(0);
+			renderTriangle(0);
 			// renderLines();
 		}
 
@@ -275,10 +268,12 @@
 
 			// todo #11 - make the triangle rotate
 
-			// todo #6
 			// 1. update the triangle geometry world matrix here (used to place the triangle into world space)
 			// 2. reset view matrix to identity
 			// 3. set the projection matrix using values from online guide
+			triangleGeometry.worldMatrix.makeIdentity();
+			triangleGeometry.worldMatrix.makeTranslation(0,0,-7);
+			projectionMatrix.makePerspective(45,(gl.canvasWidth / gl.canvasHeight),0.1,1000)
 
 			gl.bindBuffer(gl.ARRAY_BUFFER, triangleGeometry.positionBuffer);
 			gl.vertexAttribPointer(
@@ -327,7 +322,7 @@
 </head>
 
 
-<body onload="initializeAndStartRendering();">
+<body onload="initializeAndStartRendering();">`
 	<canvas id="webgl-canvas" style="border: none;" width="768" height="512"></canvas>
 </body>
 
