@@ -25,12 +25,12 @@ function Camera(input) {
 
         if (input.up) {
             // todo #7 - move the camera position a little bit in its forward direction
-           this.cameraPosition.z += .1;
+           this.cameraPosition.z -= .1;
         }
 
         if (input.down) {
             // todo #7 - move the camera position a little bit in its backward direction
-            this.cameraPosition.z -= .1;
+            this.cameraPosition.z += .1;
         }
 
         if (input.left) {

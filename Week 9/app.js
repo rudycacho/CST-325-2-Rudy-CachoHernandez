@@ -127,6 +127,8 @@ function updateAndRender() {
 
     var aspectRatio = gl.canvasWidth / gl.canvasHeight;
     var shade = (Math.cos(time.secondsElapsedSinceStart) + 1) / 2
+    var weirdNumber = (Math.cos(Math.pow(time.secondsElapsedSinceStart,2)) + 1) / 2
+
 
     time.update();
     camera.update(time.deltaTime);
@@ -144,7 +146,7 @@ function updateAndRender() {
     groundGeometry.render(camera, projectionMatrix, colorProgram);
     // Render sphere
 
-    gl.uniform4f(colorProgram.uniforms.colorUniform, 0, 0, 0, shade);
+    gl.uniform4f(colorProgram.uniforms.colorUniform, weirdNumber + shade, 1.0 - shade, weirdNumber, 1.0);
     sphereGeometry.render(camera, projectionMatrix, colorProgram);
 
 
