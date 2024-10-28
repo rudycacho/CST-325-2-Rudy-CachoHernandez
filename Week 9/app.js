@@ -21,7 +21,7 @@ window.onload = window['initializeAndStartRendering'];
 // we need to asynchronously fetch files from the "server" (your local hard drive)
 var loadedAssets = {
     unlitColorVS: null, unlitColorFS: null,
-    sphereJSON: null
+    sphereJSON: "data/sphere.json"
 };
 
 // -------------------------------------------------------------------------
@@ -112,11 +112,13 @@ function createScene() {
     groundGeometry.worldMatrix.multiply(new Matrix4().makeRotationX(90));
     groundGeometry.worldMatrix.multiply(new Matrix4().makeScale(10,10,10));
     // todo #3 - create the sphere geometry
-    // sphereGeometry = ?
-    // sphereGeometry.create(?);
+    sphereGeometry = new WebGLGeometryJSON(gl);
+    sphereGeometry.create(loadedAssets.sphereJSON);
 
     // todo #4 - scale and translate the sphere
-    // sphere.Geometry.worldMatrix...
+
+    sphereGeometry.worldMatrix.makeTranslation(0,0,-5);
+    sphereGeometry.worldMatrix.multiply(new Matrix4().makeScale(0.01,0.01,0.01));
 }
 
 // -------------------------------------------------------------------------
@@ -139,6 +141,10 @@ function updateAndRender() {
     // render ground
     gl.uniform4f(colorProgram.uniforms.colorUniform, 0.5, 0.5, 0.5, 1.0);
     groundGeometry.render(camera, projectionMatrix, colorProgram);
+    // Render sphere
+    gl.uniform4f(colorProgram.uniforms.colorUniform, 0, 0, 0, 0);
+    sphereGeometry.render(camera, projectionMatrix, colorProgram);
+
 
     // todo #4 - change color for the sphere
 
