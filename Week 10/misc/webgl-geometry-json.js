@@ -40,19 +40,23 @@ function WebGLGeometryJSON (gl) {
 		this.indexCount = indices.length;
 
 		if (rawImage) {
-			// todo #6
 			// 1. create the texture (uncomment when ready)
-			// this.texture = ?
+			this.texture = gl.createTexture();
 
-			// 2. todo bind the texture
+
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
 			// needed for the way browsers load images, ignore this
 			this.gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-			// 3. todo set wrap modes (for s and t) for the texture
-			// 4. todo set filtering modes (magnification and minification)
-			// 5. send the image WebGL to use as this texture
 
+			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+			gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+			// 5. send the image WebGL to use as this texture
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,gl.UNSIGNED_BYTE, rawImage);
 			// We're done for now, unbind
 			this.gl.bindTexture(gl.TEXTURE_2D, null);
 		}
@@ -105,10 +109,9 @@ function WebGLGeometryJSON (gl) {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
 		if (this.texture) {
-			// todo #6
-			// uncomment when ready
-			// gl.activeTexture(?);
-			// gl.bindTexture(?, ?);
+
+			gl.activeTexture(this.texture);
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
 		}
 
 		// Send our matrices to the shader

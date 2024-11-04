@@ -54,7 +54,6 @@ function WebGLGeometryQuad (gl) {
 		this.gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
 		if (rawImage) {
-			// todo #4 - create the texture (uncomment when ready)
 			this.texture = gl.createTexture();
 			// 2. bind the texture
 			gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -119,8 +118,6 @@ function WebGLGeometryQuad (gl) {
 		}
 
 		if (this.texture) {
-			// todo #4
-			// uncomment when ready
 			gl.activeTexture(this.texture);
 			gl.bindTexture(gl.TEXTURE_2D, this.texture);
 		}
