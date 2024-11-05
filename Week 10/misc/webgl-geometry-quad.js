@@ -8,6 +8,7 @@ function WebGLGeometryQuad (gl) {
 	// -----------------------------------------------------------------------------
 	this.getPosition = function() {
 		// todo #9 - return a vector4 of this object's world position contained in its matrix
+		return new Vector4(this.worldMatrix.getElement(1,3),this.worldMatrix.getElement(2,3),this.worldMatrix.getElement(3,3),this.worldMatrix.getElement(4,3));
 	}
 
 	// -----------------------------------------------------------------------------

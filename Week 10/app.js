@@ -48,7 +48,7 @@ function initGL(canvas) {
         gl.enable(gl.DEPTH_TEST);
 
         gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
+        sgl.cullFace(gl.BACK);
 
     } catch (e) {}
 
@@ -156,13 +156,14 @@ function updateAndRender() {
     gl.enable(gl.BLEND);
     //   2. set blend mode source to gl.SRC_ALPHA and destination to gl.ONE_MINUS_SRC_ALPHA
     gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-    // todo #10 apply the painter's algorithm
+    // apply the painter's algorithm
     sphereGeometryList.sort(function(a, b) {
         var last = a.getPosition().clone().subtract(camera.getPosition());
         var next = b.getPosition().clone().subtract(camera.getPosition());
         if (last.length() > next.length()){
             return -1;
-        } else {
+        }
+        else {
             return 1;
         }
     });
@@ -171,7 +172,7 @@ function updateAndRender() {
          sphereGeometryList[i].render(camera, projectionMatrix, textureShaderProgram);
     }
 
-    // todo - disable blending
+    //disable blending
     gl.disable(gl.BLEND)
 }
 
