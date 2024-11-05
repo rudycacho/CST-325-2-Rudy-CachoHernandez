@@ -157,7 +157,15 @@ function updateAndRender() {
     //   2. set blend mode source to gl.SRC_ALPHA and destination to gl.ONE_MINUS_SRC_ALPHA
     gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
     // todo #10 apply the painter's algorithm
-
+    sphereGeometryList.sort(function(a, b) {
+        var last = a.getPosition().clone().subtract(camera.getPosition());
+        var next = b.getPosition().clone().subtract(camera.getPosition());
+        if (last.length() > next.length()){
+            return -1;
+        } else {
+            return 1;
+        }
+    });
     // uncomment when directed by guide
     for (var i = 0; i < sphereGeometryList.length; ++i) {
          sphereGeometryList[i].render(camera, projectionMatrix, textureShaderProgram);
