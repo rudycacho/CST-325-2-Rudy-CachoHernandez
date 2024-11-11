@@ -18,7 +18,8 @@ void main(void) {
     // #3 calculate the lambert term
     float lambert = dot(nLightDirection,nWorldNormal);
     // specular contribution
-    // todo #4 in world space, calculate the direction from the surface point to the eye (normalized)
+    // #4 in world space, calculate the direction from the surface point to the eye (normalized)
+    vec3 vEyePosition = normalize(uCameraPosition - vWorldPosition);
     // todo #5 in world space, calculate the reflection vector (normalized)
     // todo #6 calculate the phong term
 
@@ -37,7 +38,7 @@ void main(void) {
     // add "diffuseColor" and "specularColor" when ready
     vec3 finalColor = ambient; // + diffuseColor + specularColor;
 
-    gl_FragColor = vec4(lambert,lambert,lambert, 1.0);
+    gl_FragColor = vec4(vEyePosition, 1.0);
 }
 
 // EOF 00100001-10
