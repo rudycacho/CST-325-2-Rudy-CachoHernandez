@@ -21,7 +21,7 @@ void main(void) {
     // #4 in world space, calculate the direction from the surface point to the eye (normalized)
     vec3 vEyeDirection = normalize(uCameraPosition - vWorldPosition);
     // #5 in world space, calculate the reflection vector (normalized)
-    vec3 vReflection = normalize(reflect(-vEyeDirection,nWorldNormal));
+    vec3 vReflection = normalize(reflect(-nLightDirection,nWorldNormal));
     // #6 calculate the phong term
     float phong = pow(max(dot(vReflection,vEyeDirection),0.0),64.0);
 
