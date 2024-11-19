@@ -133,9 +133,9 @@ function updateAndRender() {
     const rotationSpeed = 2 * (Math.PI / 180);
 
     // #10
-    // add keyboard controls for changing light direction here
+    // Legacy keyboard controls
 
-    if (appInput.left || appInput.right) {
+    /*if (appInput.left || appInput.right) {
         var length = lightPosition.length();
         var angle = (appInput.left ? rotationSpeed : -rotationSpeed);
         var cosTheta = Math.cos(angle);
@@ -156,10 +156,17 @@ function updateAndRender() {
         lightPosition.set(lightPosition.x, newY, newZ);
         lightPosition.normalize();
         lightPosition.multiplyScalar(length);
-    }
+    }*/
 
     time.update();
     camera.update(time.deltaTime);
+
+    var angle = (time.deltaTime);
+    var cosTheta = Math.cos(angle);
+    var sinTheta = Math.sin(angle);
+    var newX = lightPosition.x * cosTheta - lightPosition.z * sinTheta;
+    var newZ = lightPosition.x * sinTheta + lightPosition.z * cosTheta;
+    lightPosition.set(newX, lightPosition.y, newZ);
 
     // specify what portion of the canvas we want to draw to (all of it, full width and height)
     gl.viewport(0, 0, gl.canvasWidth, gl.canvasHeight);
