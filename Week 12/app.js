@@ -8,6 +8,7 @@ var camera = new OrbitCamera(appInput);
 
 var sphereGeometry = null; // this will be created after loading from a file
 var groundGeometry = null;
+var barrelGeometry = null;
 
 var projectionMatrix = new Matrix4();
 var lightPosition = new Vector3(4,1.5,0);
@@ -20,10 +21,13 @@ window.onload = window['initializeAndStartRendering'];
 
 // we need to asynchronously fetch files from the "server" (your local hard drive)
 var loadedAssets = {
-    phongTextVS: null, phongTextFS: null,
+    phongTextVS: null,
+    phongTextFS: null,
     sphereJSON: null,
     marbleImage: null,
-    crackedMudImage: null
+    crackedMudImage: null,
+    barrelJSON: null,
+    barrelImage: null,
 };
 
 // -------------------------------------------------------------------------
@@ -61,7 +65,9 @@ function loadAssets(onLoadedCB) {
         fetch('./shaders/phong.pointlit.fs.glsl').then((response) => { return response.text(); }),
         fetch('./data/sphere.json').then((response) => { return response.json(); }),
         loadImage('./data/marble.jpg'),
-        loadImage('./data/crackedMud.png')
+        loadImage('./data/crackedMud.png'),
+        fetch('./data/barrel.json').then((response) => { return response.json(); }),
+        loadImage('./data/barrel.png')
     ];
 
     Promise.all(filePromises).then(function(values) {
@@ -71,6 +77,8 @@ function loadAssets(onLoadedCB) {
         loadedAssets.sphereJSON = values[2];
         loadedAssets.marbleImage = values[3];
         loadedAssets.crackedMudImage = values[4];
+        loadedAssets.barrelJSON = values[5];
+        loadedAssets.barrelImage = values[6];
     }).catch(function(error) {
         console.error(error.message);
     }).finally(function() {
@@ -123,6 +131,19 @@ function createScene() {
     sphereGeometry.worldMatrix.makeIdentity();
     sphereGeometry.worldMatrix.multiply(translation).multiply(scale);
 
+    // Barrel stuff yo
+    barrelGeometry = new WebGLGeometryJSON(gl, phongShaderProgram);
+    barrelGeometry.create(loadedAssets.barrelJSON, loadedAssets.barrelImage);
+
+    var scale = new Matrix4().makeScale(0.3, 0.3, 0.3);
+    var translation = new Matrix4().makeTranslation(-5, 2, -5);
+    barrelGeometry.worldMatrix.makeIdentity();
+    barrelGeometry.worldMatrix.multiply(translation);
+    barrelGeometry.worldMatrix.multiply(scale);
+
+
+
+
 }
 
 // -------------------------------------------------------------------------
@@ -131,32 +152,6 @@ function updateAndRender() {
 
     var aspectRatio = gl.canvasWidth / gl.canvasHeight;
     const rotationSpeed = 2 * (Math.PI / 180);
-
-    // #10
-    // Legacy keyboard controls
-
-    /*if (appInput.left || appInput.right) {
-        var length = lightPosition.length();
-        var angle = (appInput.left ? rotationSpeed : -rotationSpeed);
-        var cosTheta = Math.cos(angle);
-        var sinTheta = Math.sin(angle);
-        var newX = lightPosition.x * cosTheta - lightPosition.z * sinTheta;
-        var newZ = lightPosition.x * sinTheta + lightPosition.z * cosTheta;
-        lightPosition.set(newX, lightPosition.y, newZ);
-        lightPosition.normalize();
-        lightPosition.multiplyScalar(length);
-    }
-    if (appInput.up || appInput.down) {
-        var length = lightPosition.length();
-        var angle = (appInput.up ? rotationSpeed : -rotationSpeed);
-        var cosTheta = Math.cos(angle);
-        var sinTheta = Math.sin(angle);
-        var newY = lightPosition.y * cosTheta - lightPosition.z * sinTheta;
-        var newZ = lightPosition.y * sinTheta + lightPosition.z * cosTheta;
-        lightPosition.set(lightPosition.x, newY, newZ);
-        lightPosition.normalize();
-        lightPosition.multiplyScalar(length);
-    }*/
 
     time.update();
     camera.update(time.deltaTime);
@@ -184,6 +179,7 @@ function updateAndRender() {
     projectionMatrix.makePerspective(45, aspectRatio, 0.1, 1000);
     groundGeometry.render(camera, projectionMatrix, phongShaderProgram);
     sphereGeometry.render(camera, projectionMatrix, phongShaderProgram);
+    barrelGeometry.render(camera, projectionMatrix, phongShaderProgram);
 }
 
 // EOF 00100001-10
