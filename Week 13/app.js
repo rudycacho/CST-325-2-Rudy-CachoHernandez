@@ -213,22 +213,25 @@ function updateAndRender() {
     var yawMatrix = new Matrix4().makeRotationY(45.0 * time.deltaTime * yaw);
     var pitchMatrix = new Matrix4().makeRotationX(45.0 * time.deltaTime * pitch);
 
-    // todo #11 Make sure lighPos and directionToLight move in a synchronized fashion
+    // #11 Make sure lightPos and directionToLight move in a synchronized fashion
 
     // Rotate the light direction
     var rotationMatrix = pitchMatrix.clone().multiply(yawMatrix);
-    directionToLight = rotationMatrix.multiplyVector(directionToLight);
+    directionToLight = rotationMatrix.multiplyVector(directionToLight).normalize();
 
     // Rotate the position where the light-camera position will move to
     lightPos = rotationMatrix.multiplyVector(lightPos);
 
+
+
     var lightTarget = new Vector4(0, 0, 0, 1);
     var up = new Vector4(0, 1, 0, 0);
+
 
     // #1 - Set up a camera that points in the direction of the light at a
     // reasonably close position such that the scene will be in the view volume.
     // We will set up the view volume boundaries with an orthographics projection later.
-    lightCamera.cameraWorldMatrix.makeLookAt((new Vector3(5,3,0)),(new Vector3(0,0,0)),(new Vector3(0,1,0)));
+    lightCamera.cameraWorldMatrix.makeLookAt(lightPos,lightTarget,up);
 
     camera.update(time.deltaTime);
 
