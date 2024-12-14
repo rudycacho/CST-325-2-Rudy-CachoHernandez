@@ -25,6 +25,19 @@ var saturnRingGeo = null;
 var uranusGeo = null;
 var neptuneGeo = null;
 var moonGeo = null;
+var earthAtmoGeo = null;
+
+// Positions
+var mercuryPos = new Vector3(0.65, 0, 0);
+var venusPos = new Vector3(1.20, 0, 0);
+var earthPos = new Vector3(1.5,0,0);
+var marsPos = new Vector3(2.53, 0, 0);
+var jupiterPos = new Vector3(8.65, 0, 0);
+var saturnPos = new Vector3(15.95, 0, 0);
+var saturnRingPos = new Vector3(15.95, 0, 0);
+var uranusPos = new Vector3(31.99, 0, 0);
+var neptunePos = new Vector3(50, 0, 0);
+var moonPos = new Vector3();
 
 
 var projectionMatrix = new Matrix4();
@@ -34,6 +47,7 @@ var lightPosition = new Vector3(0,0,0);
 var phongShaderProgram;
 var flatShaderProgram;
 var emissiveShaderProgram;
+var atmoShaderProgram;
 
 // auto start the app when the html page is ready
 window.onload = window['initializeAndStartRendering'];
@@ -197,6 +211,22 @@ function createShaders(loadedAssets) {
         textureUniform: gl.getUniformLocation(emissiveShaderProgram, "uTexture"),
     }
 
+    // Atmo Shader
+    // Emissive Shaders
+    atmoShaderProgram = createCompiledAndLinkedShaderProgram(loadedAssets.emissiveVS, loadedAssets.emissiveFS);
+
+    atmoShaderProgram.attributes = {
+        vertexPositionAttribute: gl.getAttribLocation(atmoShaderProgram, "aVertexPosition"),
+        vertexNormalsAttribute: gl.getAttribLocation(atmoShaderProgram, "aNormal"),
+        vertexTexcoordsAttribute: gl.getAttribLocation(atmoShaderProgram, "aTexcoords")
+    }
+
+    atmoShaderProgram.uniforms = {
+        worldMatrixUniform: gl.getUniformLocation(atmoShaderProgram, "uWorldMatrix"),
+        viewMatrixUniform: gl.getUniformLocation(atmoShaderProgram, "uViewMatrix"),
+        projectionMatrixUniform: gl.getUniformLocation(atmoShaderProgram, "uProjectionMatrix"),
+        textureUniform: gl.getUniformLocation(atmoShaderProgram, "uTexture"),
+    }
 }
 
 // -------------------------------------------------------------------------
@@ -291,9 +321,15 @@ function createScene() {
     earthGeo.create(loadedAssets.sphereJSON, loadedAssets.earthImage);
 
     var scale = new Matrix4().makeScale(0.0009, 0.0009, 0.0009);
-    var translation = new Matrix4().makeTranslation(1.66, 0, 0);
     earthGeo.worldMatrix.makeIdentity();
-    earthGeo.worldMatrix.multiply(translation).multiply(scale);
+    earthGeo.worldMatrix.multiply(scale);
+
+    earthAtmoGeo = new WebGLGeometryJSON(gl, atmoShaderProgram);
+    earthAtmoGeo.create(loadedAssets.sphereJSON, loadedAssets.earthCloudsImage);
+
+    var scale = new Matrix4().makeScale(0.0009, 0.0009, 0.0009);
+    earthGeo.worldMatrix.makeIdentity();
+    earthGeo.worldMatrix.multiply(scale);
 
     // Moon
 
@@ -361,31 +397,158 @@ function createScene() {
 
 // -------------------------------------------------------------------------
 function updateAndRender() {
+
     requestAnimationFrame(updateAndRender);
     window.onresize = resizeCanvas(gl);
     var aspectRatio = gl.canvasWidth / gl.canvasHeight;
 
     time.update();
     camera.update(time.deltaTime);
-    //camera.lookAt(new Vector4(1, 1, 1, 1), new Vector4(1.5, 0, 0, 1));
 
     var angle = (time.deltaTime);
     var cosTheta = Math.cos(angle);
     var sinTheta = Math.sin(angle);
-    var newX = lightPosition.x * cosTheta - lightPosition.z * sinTheta;
-    var newZ = lightPosition.x * sinTheta + lightPosition.z * cosTheta;
 
 
     // Sun Rotation
     var sunRotation = new Matrix4().makeRotationY(cosTheta / 10);
     sunGeo.worldMatrix.multiply(sunRotation);
 
-    // Earth Orbit
-    var newX = earthGeo.worldMatrix.getElement(1,1) * cosTheta - earthGeo.worldMatrix.getElement(3,1) * sinTheta;
-    var newZ = earthGeo.worldMatrix.getElement(1,1) * sinTheta + earthGeo.worldMatrix.getElement(3,1) * cosTheta;
-    var earthOrbit = new Matrix4().makeTranslation(newX, 0,newZ);
-    earthGeo.worldMatrix.multiply(earthOrbit);
+    // Mercury Orbit
+    var newX = mercuryPos.x * cosTheta - mercuryPos.z * sinTheta;
+    var newZ = mercuryPos.x * sinTheta + mercuryPos.z * cosTheta;
+    mercuryPos.set(newX, mercuryPos.y, newZ);
 
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(.0004, .0004, .0004);
+    mercuryGeo.worldMatrix.makeIdentity();
+    mercuryGeo.worldMatrix.multiply(translation).multiply(scale);
+
+    // Venus Orbit
+
+    var angle = (time.deltaTime / 2);
+    var cosTheta = Math.cos(angle);
+    var sinTheta = Math.sin(angle);
+
+    var newX = venusPos.x * cosTheta - venusPos.z * sinTheta;
+    var newZ = venusPos.x * sinTheta + venusPos.z * cosTheta;
+    venusPos.set(newX, venusPos.y, newZ);
+
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(.0009, .0009, .0009);
+    venusGeo.worldMatrix.makeIdentity();
+    venusGeo.worldMatrix.multiply(translation).multiply(scale);
+
+    // Earth Orbit
+    var angle = (time.deltaTime / 3);
+    var cosTheta = Math.cos(angle);
+    var sinTheta = Math.sin(angle);
+    var newX = earthPos.x * cosTheta - earthPos.z * sinTheta;
+    var newZ = earthPos.x * sinTheta + earthPos.z * cosTheta;
+    earthPos.set(newX, earthPos.y, newZ);
+
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(.0009, .0009, .0009);
+    var rotation = new Matrix4().makeRotationY(time.deltaTime);
+    earthGeo.worldMatrix.makeIdentity();
+    earthGeo.worldMatrix.multiply(translation).multiply(scale).multiply(rotation);
+
+    // Earth Atmoshphere
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(.0011, .0011, .0011);
+    var rotation = new Matrix4().makeRotationY(time.deltaTime);
+    earthAtmoGeo.worldMatrix.makeIdentity();
+    earthAtmoGeo.worldMatrix.multiply(translation).multiply(scale).multiply(rotation);
+
+    // Moon Orbit
+    var angle = (time.deltaTime);
+    var moonOffset = new Vector3(100,earthPos.y,earthPos.z)
+    var scale = new Matrix4().makeScale(.1, .1, .1);
+
+    var moonMatrix = new Matrix4();
+    var translationMatrix = new Matrix4().makeTranslation(moonOffset);
+    var moonTranslation = new Matrix4().clone(earthGeo.worldMatrix).multiply(translationMatrix);
+    var rotationMatrix = new Matrix4().makeRotationZ(angle * 10);
+
+
+
+    moonMatrix.multiply(earthGeo.worldMatrix);
+    moonMatrix.multiply(rotationMatrix);
+    moonMatrix.multiply(moonTranslation);
+    moonMatrix.multiply(scale);
+
+    moonGeo.worldMatrix.copy(moonMatrix);
+
+    // Mars Orbit
+    var angle = (time.deltaTime / 4);
+    var cosTheta = Math.cos(angle);
+    var sinTheta = Math.sin(angle);
+
+    var newX = marsPos.x * cosTheta - marsPos.z * sinTheta;
+    var newZ = marsPos.x * sinTheta + marsPos.z * cosTheta;
+    marsPos.set(newX, marsPos.y, newZ);
+
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(.0005, .0005, .0005);
+    marsGeo.worldMatrix.makeIdentity();
+    marsGeo.worldMatrix.multiply(translation).multiply(scale);
+
+    // Jupiter Orbit
+    var angle = (time.deltaTime / 5);
+    var cosTheta = Math.cos(angle);
+    var sinTheta = Math.sin(angle);
+
+    var newX = jupiterPos.x * cosTheta - jupiterPos.z * sinTheta;
+    var newZ = jupiterPos.x * sinTheta + jupiterPos.z * cosTheta;
+    jupiterPos.set(newX, jupiterPos.y, newZ);
+
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(.0101, .0101, .0101);
+    jupiterGeo.worldMatrix.makeIdentity();
+    jupiterGeo.worldMatrix.multiply(translation).multiply(scale);
+
+    // Saturn Orbit
+    var angle = (time.deltaTime / 6);
+    var cosTheta = Math.cos(angle);
+    var sinTheta = Math.sin(angle);
+
+    var newX = saturnPos.x * cosTheta - saturnPos.z * sinTheta;
+    var newZ = saturnPos.x * sinTheta + saturnPos.z * cosTheta;
+    saturnPos.set(newX, saturnPos.y, newZ);
+
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(0.0084, 0.0084, 0.0084);
+    saturnGeo.worldMatrix.makeIdentity();
+    saturnGeo.worldMatrix.multiply(translation).multiply(scale);
+
+
+    // Uranus Orbit
+    var angle = (time.deltaTime / 7);
+    var cosTheta = Math.cos(angle);
+    var sinTheta = Math.sin(angle);
+
+    var newX = uranusPos.x * cosTheta - uranusPos.z * sinTheta;
+    var newZ = uranusPos.x * sinTheta + uranusPos.z * cosTheta;
+    uranusPos.set(newX, uranusPos.y, newZ);
+
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(.0036, .0036, .0036);
+    uranusGeo.worldMatrix.makeIdentity();
+    uranusGeo.worldMatrix.multiply(translation).multiply(scale);
+
+    // Neptune Orbit
+    var angle = (time.deltaTime / 8);
+    var cosTheta = Math.cos(angle);
+    var sinTheta = Math.sin(angle);
+
+    var newX = neptunePos.x * cosTheta - neptunePos.z * sinTheta;
+    var newZ = neptunePos.x * sinTheta + neptunePos.z * cosTheta;
+    neptunePos.set(newX, neptunePos.y, newZ);
+
+    var translation = new Matrix4().makeTranslation(newX, 0, newZ);
+    var scale = new Matrix4().makeScale(.0035, .0035, .0035);
+    neptuneGeo.worldMatrix.makeIdentity();
+    neptuneGeo.worldMatrix.multiply(translation).multiply(scale);
 
 
 
@@ -424,6 +587,7 @@ function updateAndRender() {
     saturnGeo.render(camera, projectionMatrix, phongShaderProgram)
     uranusGeo.render(camera, projectionMatrix, phongShaderProgram)
     neptuneGeo.render(camera, projectionMatrix, phongShaderProgram)
+    //earthAtmoGeo.render(camera,projectionMatrix,atmoShaderProgram)
 
 
 

@@ -326,7 +326,8 @@ Matrix4.prototype = {
 
     moonMatrix.multiply(earthTransform);
     moonMatrix.multiply(rotationMatrix);
-    moonMatrix.multiply(moonTranslation);
+    moonMatrix.multiply(moonTranslation)
+
 
     // todo - combine all necessary matrices necessary to achieve the desired effect
 
